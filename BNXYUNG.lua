@@ -6,31 +6,31 @@ local LocalPlayer = Players.LocalPlayer
 local gui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
 gui.Name = "BNXYUNG_PANEL"
 gui.ResetOnSpawn = false
-gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
 local scroll = Instance.new("ScrollingFrame", gui)
-scroll.Size = UDim2.new(0, 300, 0, 400)
-scroll.Position = UDim2.new(0, 20, 0.5, -200)
-scroll.CanvasSize = UDim2.new(0, 0, 0, 1000)
+scroll.Size = UDim2.new(0, 350, 0, 450)
+scroll.Position = UDim2.new(0, 20, 0.5, -225)
+scroll.CanvasSize = UDim2.new(0, 0, 0, 2000)
 scroll.ScrollBarThickness = 6
-scroll.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+scroll.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 scroll.Active = true
 scroll.Draggable = true
 
 local title = Instance.new("TextLabel", scroll)
-title.Size = UDim2.new(1, 0, 0, 30)
-title.Text = "BNXYUNG PANEL ROBLOX"
+title.Size = UDim2.new(1, 0, 0, 40)
+title.Text = "BNXYUNG PANEL ROBLOX 🔥"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.Font = Enum.Font.GothamBold
-title.TextSize = 18
+title.TextSize = 20
 title.BackgroundTransparency = 1
 title.Position = UDim2.new(0, 0, 0, 0)
 
 -- Función para crear botones
-local function createToggle(name, yPos, callback)
+local yOffset = 50
+local function createToggle(name, callback)
 	local btn = Instance.new("TextButton", scroll)
-	btn.Size = UDim2.new(1, -20, 0, 30)
-	btn.Position = UDim2.new(0, 10, 0, yPos)
+	btn.Size = UDim2.new(1, -20, 0, 35)
+	btn.Position = UDim2.new(0, 10, 0, yOffset)
 	btn.Text = name .. ": OFF"
 	btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -48,119 +48,154 @@ local function createToggle(name, yPos, callback)
 			Duration = 3;
 		})
 	end)
+
+	yOffset += 40
 end
 
--- Funciones reales
-createToggle("Auto Steal", 40, function(state)
-	local remote = ReplicatedStorage:FindFirstChild("StealBrainrot")
-	if remote and state then
-		while state do
-			for _, player in pairs(Players:GetPlayers()) do
-				if player ~= LocalPlayer then
-					remote:FireServer(player.Name)
+-- 🔧 FUNCIONES REALES DEL PANEL
+createToggle("Auto Steal", function(state)
+	if state then
+		local remote = ReplicatedStorage:FindFirstChild("StealBrainrot")
+		if remote then
+			while state do
+				for _, player in pairs(Players:GetPlayers()) do
+					if player ~= LocalPlayer then
+						remote:FireServer(player.Name)
+					end
+				end
+				wait(2)
+			end
+		end
+	end
+end)
+
+createToggle("TP a Brainrot", function(state)
+	if state then
+		local brainrots = workspace:FindFirstChild("Brainrots")
+		if brainrots then
+			local highest = nil
+			for _, b in pairs(brainrots:GetChildren()) do
+				if not highest or b.Value > highest.Value then
+					highest = b
 				end
 			end
-			wait(2)
-		end
-	end
-end)
-
-createToggle("TP a Base", 80, function(state)
-	if state then
-		local bases = workspace:FindFirstChild("Bases")
-		if bases then
-			local base = bases:FindFirstChild(LocalPlayer.Name)
-			if base and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-				LocalPlayer.Character.HumanoidRootPart.CFrame = base.CFrame + Vector3.new(0,2,0)
+			if highest and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+				LocalPlayer.Character.HumanoidRootPart.CFrame = highest.CFrame + Vector3.new(0,2,0)
 			end
 		end
 	end
 end)
 
-createToggle("Invisibilidad", 120, function(state)
-	if state then
-		local char = LocalPlayer.Character
-		if not char then return end
-		for _, part in pairs(char:GetDescendants()) do
-			if part:IsA("BasePart") then
-				part.Transparency = 1
-				part.CanCollide = false
-			elseif part:IsA("Decal") or part:IsA("Texture") then
-				part.Transparency = 1
-			elseif part:IsA("Accessory") or part:IsA("Clothing") or part:IsA("ShirtGraphic") then
-				part:Destroy()
-			end
-		end
-		if char:FindFirstChild("Humanoid") then
-			char.Humanoid.NameDisplayDistance = 0
-			char.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
-		end
-	end
-end)
-
-createToggle("Auto Dinero", 160, function(state)
-	if state then
-		local remote = ReplicatedStorage:FindFirstChild("CollectMoney")
-		if remote then remote:FireServer() end
-	end
-end)
-
-createToggle("Comprar Brainrot OP", 200, function(state)
-	if state then
-		local remote = ReplicatedStorage:FindFirstChild("BuyBrainrot")
-		if remote then remote:FireServer("GodOP") end
-	end
-end)
-
-createToggle("NoClip", 240, function(state)
+createToggle("Invisible Steal", function(state)
 	if state then
 		local char = LocalPlayer.Character
 		if char then
-			for _, part in pairs(char:GetChildren()) do
+			for _, part in pairs(char:GetDescendants()) do
 				if part:IsA("BasePart") then
+					part.Transparency = 1
 					part.CanCollide = false
+				elseif part:IsA("Decal") or part:IsA("Texture") then
+					part.Transparency = 1
+				elseif part:IsA("Accessory") then
+					part:Destroy()
 				end
 			end
 		end
 	end
 end)
 
-createToggle("Auto Revive", 280, function(state)
+createToggle("Player ESP", function(state)
 	if state then
-		LocalPlayer.CharacterAdded:Connect(function()
-			wait(1)
-			local bases = workspace:FindFirstChild("Bases")
-			if bases then
-				local base = bases:FindFirstChild(LocalPlayer.Name)
-				if base and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-					LocalPlayer.Character.HumanoidRootPart.CFrame = base.CFrame + Vector3.new(0,2,0)
+		for _, player in pairs(Players:GetPlayers()) do
+			if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+				local billboard = Instance.new("BillboardGui", player.Character.HumanoidRootPart)
+				billboard.Size = UDim2.new(0, 100, 0, 40)
+				billboard.AlwaysOnTop = true
+				local label = Instance.new("TextLabel", billboard)
+				label.Size = UDim2.new(1, 0, 1, 0)
+				label.Text = player.Name
+				label.TextColor3 = Color3.fromRGB(255, 0, 0)
+				label.BackgroundTransparency = 1
+			end
+		end
+	end
+end)
+
+createToggle("Aimbot", function(state)
+	if state then
+		local mouse = LocalPlayer:GetMouse()
+		game:GetService("RunService").RenderStepped:Connect(function()
+			local target = nil
+			for _, player in pairs(Players:GetPlayers()) do
+				if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+					target = player.Character.HumanoidRootPart
+					break
 				end
+			end
+			if target and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+				mouse.TargetFilter = target
+				LocalPlayer.Character.Humanoid:MoveTo(target.Position)
 			end
 		end)
 	end
 end)
 
--- Botón flotante para minimizar
-local toggleBtn = Instance.new("TextButton", gui)
-toggleBtn.Size = UDim2.new(0, 100, 0, 30)
-toggleBtn.Position = UDim2.new(0, 20, 0.5, 220)
-toggleBtn.Text = "Mostrar Panel"
-toggleBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-toggleBtn.Font = Enum.Font.GothamBold
-toggleBtn.TextSize = 14
-toggleBtn.Visible = false
-
-local function minimize()
-	scroll.Visible = false
-	toggleBtn.Visible = true
-end
-
-toggleBtn.MouseButton1Click:Connect(function()
-	scroll.Visible = true
-	toggleBtn.Visible = false
+createToggle("Infinity Jump", function(state)
+	if state then
+		game:GetService("UserInputService").JumpRequest:Connect(function()
+			if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+				LocalPlayer.Character.Humanoid:ChangeState("Jumping")
+			end
+		end)
+	end
 end)
 
-createToggle("Minimizar Panel", 320, function(state)
-	if state then minimize() end
+createToggle("Anti AFK", function(state)
+	if state then
+		for _, v in pairs(getconnections(LocalPlayer.Idled)) do
+			v:Disable()
+		end
+	end
+end)
+
+createToggle("Server Hop", function(state)
+	if state then
+		local tp = game:GetService("TeleportService")
+		local servers = {}
+		local req = syn and syn.request or http and http.request or http_request
+		local response = req({
+			Url = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"
+	 })
+		local data = game:GetService("HttpService"):JSONDecode(response.Body)
+		for _, server in pairs(data.data) do
+			if server.playing < server.maxPlayers then
+				tp:TeleportToPlaceInstance(game.PlaceId, server.id)
+				break
+			end
+		end
+	end
+end)
+
+createToggle("Reduce Graphics", function(state)
+	if state then
+		for _, obj in pairs(workspace:GetDescendants()) do
+			if obj:IsA("ParticleEmitter") or obj:IsA("Trail") or obj:IsA("Beam") then
+				obj.Enabled = false
+			elseif obj:IsA("Texture") or obj:IsA("Decal") then
+				obj.Transparency = 1
+			end
+		end
+	end
+end)
+
+createToggle("Webhook Activado", function(state)
+	if state then
+		local url = "TU_WEBHOOK_AQUI"
+		local http = game:GetService("HttpService")
+		local data = {
+			content = "BNXYUNG PANEL ACTIVADO 🔥",
+			username = "BNXYUNG"
+		}
+		http:PostAsync(url, http:JSONEncode(data))
+	end
 end)
