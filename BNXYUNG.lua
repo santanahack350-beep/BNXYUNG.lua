@@ -1,6 +1,8 @@
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local StarterGui = game:GetService("StarterGui")
+local UIS = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 
 -- GUI principal
 local gui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
@@ -78,6 +80,40 @@ local function createToggle(name, callback)
 	yOffset += 40
 end
 
+-- Submenú de velocidad y salto
+local speedMenu = Instance.new("Frame", gui)
+speedMenu.Size = UDim2.new(0, 200, 0, 100)
+speedMenu.Position = UDim2.new(0.5, -100, 0.5, -50)
+speedMenu.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+speedMenu.Visible = false
+
+local speedLabel = Instance.new("TextLabel", speedMenu)
+speedLabel.Size = UDim2.new(1, 0, 0, 30)
+speedLabel.Text = "Modo Rápido Activado"
+speedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+speedLabel.Font = Enum.Font.GothamBold
+speedLabel.TextSize = 16
+speedLabel.BackgroundTransparency = 1
+
+-- Activar velocidad y salto
+local function activateSpeed()
+	local char = LocalPlayer.Character
+	if char and char:FindFirstChild("Humanoid") then
+		char.Humanoid.WalkSpeed = 24  -- 70% boost
+		char.Humanoid.JumpPower = 70
+		speedMenu.Visible = true
+		wait(5)
+		speedMenu.Visible = false
+	end
+end
+
+-- Detectar si el jugador agarra un Brainrot
+workspace.ChildAdded:Connect(function(obj)
+	if obj.Name == "Brainrot" and obj:IsDescendantOf(LocalPlayer.Character) then
+		activateSpeed()
+	end
+end)
+
 -- 🔧 CATEGORÍAS Y FUNCIONES
 createSection("Main")
 createToggle("Auto Buy Brainrot", function(state) end)
@@ -118,7 +154,7 @@ createToggle("Timer ESP", function(state) end)
 createToggle("Highest Value ESP", function(state) end)
 createToggle("Infinity Jump", function(state)
 	if state then
-		game:GetService("UserInputService").JumpRequest:Connect(function()
+		UIS.JumpRequest:Connect(function()
 			if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
 				LocalPlayer.Character.Humanoid:ChangeState("Jumping")
 			end
@@ -127,7 +163,9 @@ createToggle("Infinity Jump", function(state)
 end)
 createToggle("Anti Ragdoll", function(state) end)
 createToggle("Chilli Booster", function(state) end)
-createToggle("Speed Boost", function(state) end)
+createToggle("Speed Boost", function(state)
+	if state then activateSpeed() end
+end)
 
 createSection("Server")
 createToggle("Server Hop", function(state) end)
@@ -160,14 +198,4 @@ createToggle("Webhook Activado", function(state)
 end)
 
 -- Minimizar función
-createToggle("Minimizar Panel", function(state)
-	if state then
-		scroll.Visible = false
-		toggleBtn.Visible = true
-	end
-end)
-
-toggleBtn.MouseButton1Click:Connect(function()
-	scroll.Visible = true
-	toggleBtn.Visible = false
-end)
+createToggle("Minimizar
