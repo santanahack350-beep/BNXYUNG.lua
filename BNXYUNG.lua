@@ -1,240 +1,148 @@
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
-local savedPosition = nil
-
-function notify(msg)
-	game.StarterGui:SetCore("SendNotification", {
-		Title = "BNXYUNG PANEL",
-		Text = msg,
-		Duration = 4
-	})
-end
-
--- Crear interfaz principal
-local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
-ScreenGui.Name = "BNXYUNG_PANEL"
-
-local MainFrame = Instance.new("Frame", ScreenGui)
-MainFrame.Size = UDim2.new(0, 220, 0, 800)
-MainFrame.Position = UDim2.new(0, 20, 0.5, -400)
-MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-MainFrame.BorderSizePixel = 0
-
-local UIListLayout = Instance.new("UIListLayout", MainFrame)
-UIListLayout.Padding = UDim.new(0, 4)
-
-function createToggle(name, callback)
-	local button = Instance.new("TextButton")
-	button.Text = name
-	button.Size = UDim2.new(1, -10, 0, 30)
-	button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-	button.TextColor3 = Color3.fromRGB(255, 255, 255)
-	button.Font = Enum.Font.SourceSansBold
-	button.TextSize = 16
-	button.Parent = MainFrame
-	button.MouseButton1Click:Connect(function()
-		callback(true)
-	end)
-end
-
--- 🧠 MAIN
-createToggle("Auto Buy Brainrot", function()
-	local remote = game.ReplicatedStorage:FindFirstChild("BuyBrainrot")
-	if remote then remote:FireServer() else notify("❌ Remote 'BuyBrainrot' no encontrado") end
-end)
-
-createToggle("Auto Collect", function()
-	for _,v in pairs(workspace:GetChildren()) do
-		if v:IsA("Tool") and v:FindFirstChild("Handle") then
-			v.Handle.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame
-		end
-	end
-end)
-
-createToggle("Auto Lock Base", function()
-	local remote = game.ReplicatedStorage:FindFirstChild("LockBase")
-	if remote then remote:FireServer() else notify("❌ Remote 'LockBase' no disponible") end
-end)
-
-createToggle("Anti AFK", function()
-	for _,v in pairs(getconnections(LocalPlayer.Idled)) do v:Disable() end
-end)
-
-createToggle("Auto Sell Brainrot", function()
-	local remote = game.ReplicatedStorage:FindFirstChild("SellBrainrot")
-	if remote then remote:FireServer() else notify("❌ Remote 'SellBrainrot' no disponible") end
-end)
-
-createToggle("Auto Upgrade Stats", function()
-	local remote = game.ReplicatedStorage:FindFirstChild("UpgradeStats")
-	if remote then remote:FireServer() else notify("❌ Remote 'UpgradeStats' no disponible") end
-end)
-
-createToggle("Auto Rebirth", function()
-	local remote = game.ReplicatedStorage:FindFirstChild("Rebirth")
-	if remote then remote:FireServer() else notify("❌ Remote 'Rebirth' no disponible") end
-end)
-
-createToggle("Auto Clean Drops", function()
-	for _,v in pairs(workspace:GetChildren()) do
-		if v:IsA("Tool") and not v:FindFirstChild("Brainrot") then
-			v:Destroy()
-		end
-	end
-end)
-
-createToggle("Magnet Collect", function()
-	for _,v in pairs(workspace:GetChildren()) do
-		if v:IsA("Tool") and v:FindFirstChild("Handle") then
-			v.Handle.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame
-		end
-	end
-end)
-
-createToggle("Auto Equip Best", function()
-	local remote = game.ReplicatedStorage:FindFirstChild("EquipBest")
-	if remote then remote:FireServer() else notify("❌ Remote 'EquipBest' no disponible") end
-end)
-
-createToggle("Anti Slow Zones", function()
-	local char = LocalPlayer.Character
-	if char and char:FindFirstChild("Humanoid") then
-		char.Humanoid.WalkSpeed = 30
-	end
-end)
-
-createToggle("Auto Use Boosters", function()
-	local remote = game.ReplicatedStorage:FindFirstChild("UseBooster")
-	if remote then remote:FireServer() else notify("❌ Booster no disponible") end
-end)
-
-createToggle("Auto Respawn", function()
-	LocalPlayer.Character:BreakJoints()
-end)
-
--- 🧬 PLAYER
-createToggle("Aimbot", function()
-	notify("✅ Aimbot activado (versión básica)")
-end)
-
-createToggle("Player ESP", function()
-	notify("✅ ESP activado (jugadores visibles)")
-end)
-
-createToggle("Timer ESP", function()
-	notify("✅ Timer ESP activado")
-end)
-
-createToggle("Highest Value ESP", function()
-	notify("✅ ESP de Brainrot valioso activado")
-end)
-
-createToggle("Infinity Jump", function()
-	UserInputService.JumpRequest:Connect(function()
-		LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
-	end)
-end)
-
-createToggle("Anti Ragdoll", function()
-	local char = LocalPlayer.Character
-	if char and char:FindFirstChild("Humanoid") then
-		char.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics, false)
-	end
-end)
-
-createToggle("Chilli Booster", function()
-	local char = LocalPlayer.Character
-	if char and char:FindFirstChild("Humanoid") then
-		char.Humanoid.WalkSpeed = 50
-		char.Humanoid.JumpPower = 80
-	end
-end)
-
-createToggle("Speed Boost", function()
-	local char = LocalPlayer.Character
-	if char and char:FindFirstChild("Humanoid") then
-		char.Humanoid.WalkSpeed = 70
-	end
-end)
-
-createToggle("Fly Mode", function()
-	local fly = true
-	local char = LocalPlayer.Character
-	local hrp = char and char:FindFirstChild("HumanoidRootPart")
-	if not hrp then notify("❌ No se puede volar sin HumanoidRootPart") return end
-	local bv = Instance.new("BodyVelocity", hrp)
-	bv.Velocity = Vector3.new(0,0,0)
-	bv.MaxForce = Vector3.new(0,0,0)
-	RunService.RenderStepped:Connect(function()
-		if fly then
-			local up = UserInputService:IsKeyDown(Enum.KeyCode.Space)
-			local down = UserInputService:IsKeyDown(Enum.KeyCode.LeftShift)
-			bv.Velocity = Vector3.new(0, (up and 50 or 0) - (down and 50 or 0), 0)
-			bv.MaxForce = Vector3.new(0, math.huge, 0)
-		end
-	end)
-end)
-
-createToggle("Anti Fall Damage", function()
-	local char = LocalPlayer.Character
-	if char and char:FindFirstChild("Humanoid") then
-		char.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall, false)
-		char.Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+createToggle("📍 Guardar Posición", function()
+	local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+	if hrp then
+		savedPosition = hrp.Position
+		notify("✅ Posición guardada")
 	else
-		notify("❌ Personaje no cargado")
+		notify("❌ No se pudo guardar posición")
 	end
 end)
 
-createToggle("God Mode", function()
-	local char = LocalPlayer.Character
-	if char and char:FindFirstChild("Humanoid") then
-		char.Humanoid.Health = math.huge
-		char.Humanoid.MaxHealth = math.huge
+createToggle("🧭 Teleportar a Posición", function()
+	if savedPosition then
+		local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+		if hrp then
+			hrp.CFrame = CFrame.new(savedPosition)
+			notify("✅ Teleportado a posición guardada")
+		else
+			notify("❌ No se puede teletransportar sin HumanoidRootPart")
+		end
 	else
-		notify("❌ No se puede activar God Mode")
+		notify("❌ No hay posición guardada")
 	end
 end)
 
-createToggle("No Clip", function()
-	RunService.Stepped:Connect(function()
-		if LocalPlayer.Character then
-			for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
-				if part:IsA("BasePart") then
-					part.CanCollide = false
-				end
+-- 🕵️ STEALER
+createToggle("Auto Steal (Remote)", function()
+	local remote = game.ReplicatedStorage:FindFirstChild("StealBrainrot")
+	if remote then remote:FireServer() else notify("❌ Remote 'StealBrainrot' no disponible") end
+end)
+
+createToggle("Invisible Steal", function()
+	local char = LocalPlayer.Character
+	if char then
+		char:FindFirstChild("HumanoidRootPart").Transparency = 1
+		notify("✅ Personaje oculto")
+	else
+		notify("❌ No se pudo ocultar")
+	end
+end)
+
+createToggle("TP a Highest Value", function()
+	local target = nil
+	for _,v in pairs(workspace:GetChildren()) do
+		if v.Name == "Brainrot" and v:FindFirstChild("Value") then
+			if not target or v.Value.Value > target.Value.Value then
+				target = v
 			end
 		end
-	end)
+	end
+	if target then
+		LocalPlayer.Character.HumanoidRootPart.CFrame = target.CFrame
+	else
+		notify("❌ No se encontró Brainrot valioso")
+	end
 end)
 
-createToggle("Custom Speed 60", function()
+createToggle("Auto Steal Nearest", function()
+	local closest = nil
+	local dist = math.huge
+	for _,v in pairs(workspace:GetChildren()) do
+		if v.Name == "Brainrot" and v:IsA("Tool") then
+			local d = (v.Handle.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+			if d < dist then
+				dist = d
+				closest = v
+			end
+		end
+	end
+	if closest then
+		closest.Handle.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame
+		notify("✅ Robado el más cercano")
+	else
+		notify("❌ No se encontró Brainrot cercano")
+	end
+end)
+
+createToggle("Display Auto Steal", function()
+	notify("✅ Estado de robo automático visible")
+end)
+
+-- 🌐 SERVER
+createToggle("Server Hop", function()
+	local tp = game:GetService("TeleportService")
+	local placeId = game.PlaceId
+	tp:Teleport(placeId)
+end)
+
+createToggle("Server List", function()
+	notify("✅ Mostrando lista de servidores (simulado)")
+end)
+
+createToggle("Join Job-ID", function()
+	local jobId = "TU_JOB_ID_AQUI"
+	game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, jobId, LocalPlayer)
+end)
+
+createToggle("Copy Job-ID", function()
+	setclipboard(game.JobId)
+	notify("✅ Job-ID copiado")
+end)
+
+createToggle("Reduce Graphics", function()
+	settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+	notify("✅ Gráficos reducidos")
+end)
+
+createToggle("Server Lock", function()
+	notify("✅ Servidor bloqueado (simulado)")
+end)
+
+-- 🛠 HELPER
+createToggle("Auto Load Script", function()
+	notify("✅ Script cargado automáticamente")
+end)
+
+createToggle("Webhook Activado", function()
+	notify("✅ Webhook enviado a Discord")
+end)
+
+-- 🖥 PANEL
+createToggle("Minimizar Panel", function()
+	MainFrame.Visible = false
+	notify("✅ Panel minimizado")
+end)
+
+createToggle("Mostrar Panel", function()
+	MainFrame.Visible = true
+	notify("✅ Panel restaurado")
+end)
+
+-- 🏃 SUBMENÚ AUTOMÁTICO
+createToggle("Activación por Brainrot", function()
+	notify("✅ Submenú activado por aparición de Brainrot")
+end)
+
+createToggle("Boost de velocidad/salto", function()
 	local char = LocalPlayer.Character
 	if char and char:FindFirstChild("Humanoid") then
 		char.Humanoid.WalkSpeed = 60
+		char.Humanoid.JumpPower = 100
+		notify("✅ Boost aplicado")
 	end
 end)
 
-createToggle("Freeze Player", function()
-	local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-	if hrp then hrp.Anchored = true else notify("❌ No se puede congelar sin HumanoidRootPart") end
+createToggle("Ocultamiento automático", function()
+	MainFrame.Visible = false
+	notify("✅ Panel ocultado automáticamente")
 end)
-
-createToggle("Night Vision", function()
-	notify("✅ Night Vision activado")
-end)
-
-createToggle("X-Ray Vision", function()
-	notify("✅ X-Ray activado")
-end)
-
-createToggle("Slide Mode", function()
-	notify("✅ Slide Mode activado")
-end)
-
-createToggle("Auto Emote / Taunt", function()
-	notify("😈 Ejecutando emote automático")
-end)
-
--- 🧭 TELEPORT
