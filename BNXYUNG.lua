@@ -8,9 +8,9 @@ gui.Name = "BNXYUNG_PANEL"
 gui.ResetOnSpawn = false
 
 local scroll = Instance.new("ScrollingFrame", gui)
-scroll.Size = UDim2.new(0, 350, 0, 450)
-scroll.Position = UDim2.new(0, 20, 0.5, -225)
-scroll.CanvasSize = UDim2.new(0, 0, 0, 2000)
+scroll.Size = UDim2.new(0, 350, 0, 500)
+scroll.Position = UDim2.new(0, 20, 0.5, -250)
+scroll.CanvasSize = UDim2.new(0, 0, 0, 2500)
 scroll.ScrollBarThickness = 6
 scroll.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 scroll.Active = true
@@ -52,7 +52,7 @@ local function createToggle(name, callback)
 	yOffset += 40
 end
 
--- 🔧 FUNCIONES REALES DEL PANEL
+-- 🔧 FUNCIONES REALES
 createToggle("Auto Steal", function(state)
 	if state then
 		local remote = ReplicatedStorage:FindFirstChild("StealBrainrot")
@@ -69,7 +69,7 @@ createToggle("Auto Steal", function(state)
 	end
 end)
 
-createToggle("TP a Brainrot", function(state)
+createToggle("TP a Highest Value", function(state)
 	if state then
 		local brainrots = workspace:FindFirstChild("Brainrots")
 		if brainrots then
@@ -99,6 +99,46 @@ createToggle("Invisible Steal", function(state)
 				elseif part:IsA("Accessory") then
 					part:Destroy()
 				end
+			end
+		end
+	end
+end)
+
+createToggle("Display Auto Steal", function(state)
+	if state then
+		local label = Instance.new("TextLabel", gui)
+		label.Size = UDim2.new(0, 200, 0, 30)
+		label.Position = UDim2.new(0.5, -100, 0, 10)
+		label.Text = "Auto Steal Activado"
+		label.TextColor3 = Color3.fromRGB(255, 255, 255)
+		label.BackgroundTransparency = 1
+		label.Font = Enum.Font.GothamBold
+		label.TextSize = 16
+		wait(5)
+		label:Destroy()
+	end
+end)
+
+createToggle("Auto Steal Nearest", function(state)
+	if state then
+		local remote = ReplicatedStorage:FindFirstChild("StealBrainrot")
+		if remote then
+			while state do
+				local closest = nil
+				local dist = math.huge
+				for _, b in pairs(workspace:GetChildren()) do
+					if b.Name == "Brainrot" and b:IsA("Part") then
+						local d = (LocalPlayer.Character.HumanoidRootPart.Position - b.Position).Magnitude
+						if d < dist then
+							dist = d
+							closest = b
+						end
+					end
+				end
+				if closest then
+					remote:FireServer(closest.Name)
+				end
+				wait(2)
 			end
 		end
 	end
@@ -165,7 +205,7 @@ createToggle("Server Hop", function(state)
 		local req = syn and syn.request or http and http.request or http_request
 		local response = req({
 			Url = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"
-	 })
+		})
 		local data = game:GetService("HttpService"):JSONDecode(response.Body)
 		for _, server in pairs(data.data) do
 			if server.playing < server.maxPlayers then
@@ -181,21 +221,4 @@ createToggle("Reduce Graphics", function(state)
 		for _, obj in pairs(workspace:GetDescendants()) do
 			if obj:IsA("ParticleEmitter") or obj:IsA("Trail") or obj:IsA("Beam") then
 				obj.Enabled = false
-			elseif obj:IsA("Texture") or obj:IsA("Decal") then
-				obj.Transparency = 1
-			end
-		end
-	end
-end)
-
-createToggle("Webhook Activado", function(state)
-	if state then
-		local url = "TU_WEBHOOK_AQUI"
-		local http = game:GetService("HttpService")
-		local data = {
-			content = "BNXYUNG PANEL ACTIVADO 🔥",
-			username = "BNXYUNG"
-		}
-		http:PostAsync(url, http:JSONEncode(data))
-	end
-end)
+			elseif obj:IsA("Texture")
