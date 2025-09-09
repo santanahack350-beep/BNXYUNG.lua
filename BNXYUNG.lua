@@ -1,12 +1,24 @@
 local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalPlayer = Players.LocalPlayer
+local StarterGui = game:GetService("StarterGui")
 
 -- GUI principal
 local gui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
 gui.Name = "BNXYUNG_PANEL"
 gui.ResetOnSpawn = false
 
+-- Minimizar botón
+local toggleBtn = Instance.new("TextButton", gui)
+toggleBtn.Size = UDim2.new(0, 120, 0, 30)
+toggleBtn.Position = UDim2.new(0, 20, 0.5, 230)
+toggleBtn.Text = "Mostrar Panel"
+toggleBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+toggleBtn.Font = Enum.Font.GothamBold
+toggleBtn.TextSize = 14
+toggleBtn.Visible = false
+
+-- Contenedor principal con scroll
 local scroll = Instance.new("ScrollingFrame", gui)
 scroll.Size = UDim2.new(0, 350, 0, 500)
 scroll.Position = UDim2.new(0, 20, 0.5, -250)
@@ -16,6 +28,7 @@ scroll.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 scroll.Active = true
 scroll.Draggable = true
 
+-- Título
 local title = Instance.new("TextLabel", scroll)
 title.Size = UDim2.new(1, 0, 0, 40)
 title.Text = "BNXYUNG PANEL ROBLOX 🔥"
@@ -25,8 +38,21 @@ title.TextSize = 20
 title.BackgroundTransparency = 1
 title.Position = UDim2.new(0, 0, 0, 0)
 
--- Función para crear botones
+-- Función para crear secciones
 local yOffset = 50
+local function createSection(name)
+	local section = Instance.new("TextLabel", scroll)
+	section.Size = UDim2.new(1, -20, 0, 30)
+	section.Position = UDim2.new(0, 10, 0, yOffset)
+	section.Text = "— " .. name .. " —"
+	section.TextColor3 = Color3.fromRGB(0, 255, 255)
+	section.Font = Enum.Font.GothamBold
+	section.TextSize = 16
+	section.BackgroundTransparency = 1
+	yOffset += 35
+end
+
+-- Función para crear botones
 local function createToggle(name, callback)
 	local btn = Instance.new("TextButton", scroll)
 	btn.Size = UDim2.new(1, -20, 0, 35)
@@ -42,7 +68,7 @@ local function createToggle(name, callback)
 		state = not state
 		btn.Text = name .. ": " .. (state and "ON" or "OFF")
 		if callback then callback(state) end
-		game.StarterGui:SetCore("SendNotification", {
+		StarterGui:SetCore("SendNotification", {
 			Title = "BNXYUNG PANEL";
 			Text = name .. " " .. (state and "Activado" or "Desactivado");
 			Duration = 3;
@@ -52,94 +78,44 @@ local function createToggle(name, callback)
 	yOffset += 40
 end
 
--- 🔧 FUNCIONES REALES
-createToggle("Auto Steal", function(state)
+-- 🔧 CATEGORÍAS Y FUNCIONES
+createSection("Main")
+createToggle("Auto Buy Brainrot", function(state) end)
+createToggle("Auto Collect", function(state) end)
+createToggle("Auto Lock Base", function(state) end)
+createToggle("Anti AFK", function(state)
 	if state then
-		local remote = ReplicatedStorage:FindFirstChild("StealBrainrot")
-		if remote then
-			while state do
-				for _, player in pairs(Players:GetPlayers()) do
-					if player ~= LocalPlayer then
-						remote:FireServer(player.Name)
-					end
-				end
-				wait(2)
-			end
+		for _, v in pairs(getconnections(LocalPlayer.Idled)) do
+			v:Disable()
 		end
 	end
 end)
 
-createToggle("TP a Highest Value", function(state)
+createSection("Stealer")
+createToggle("Auto Steal", function(state) end)
+createToggle("Invisible Steal", function(state) end)
+createToggle("TP a Highest Value", function(state) end)
+createToggle("Auto Steal Nearest", function(state) end)
+createToggle("Display Auto Steal", function(state)
 	if state then
-		local brainrots = workspace:FindFirstChild("Brainrots")
-		if brainrots then
-			local highest = nil
-			for _, b in pairs(brainrots:GetChildren()) do
-				if not highest or b.Value > highest.Value then
-					highest = b
-				end
-			end
-			if highest and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-				LocalPlayer.Character.HumanoidRootPart.CFrame = highest.CFrame + Vector3.new(0,2,0)
-			end
-		end
+		local label = Instance.new("TextLabel", gui)
+		label.Size = UDim2.new(0, 200, 0, 30)
+		label.Position = UDim2.new(0.5, -100, 0, 10)
+		label.Text = "Auto Steal Activado"
+		label.TextColor3 = Color3.fromRGB(255, 255, 255)
+		label.BackgroundTransparency = 1
+		label.Font = Enum.Font.GothamBold
+		label.TextSize = 16
+		wait(5)
+		label:Destroy()
 	end
 end)
 
-createToggle("Invisible Steal", function(state)
-	if state then
-		local char = LocalPlayer.Character
-		if char then
-			for _, part in pairs(char:GetDescendants()) do
-				if part:IsA("BasePart") then
-					part.Transparency = 1
-					part.CanCollide = false
-				elseif part:IsA("Decal") or part:IsA("Texture") then
-					part.Transparency = 1
-				elseif part:IsA("Accessory") then
-					part:Destroy()
-				end
-			end
-		end
-	end
-end)
-
-createToggle("Player ESP", function(state)
-	if state then
-		for _, player in pairs(Players:GetPlayers()) do
-			if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-				local billboard = Instance.new("BillboardGui", player.Character.HumanoidRootPart)
-				billboard.Size = UDim2.new(0, 100, 0, 40)
-				billboard.AlwaysOnTop = true
-				local label = Instance.new("TextLabel", billboard)
-				label.Size = UDim2.new(1, 0, 1, 0)
-				label.Text = player.Name
-				label.TextColor3 = Color3.fromRGB(255, 0, 0)
-				label.BackgroundTransparency = 1
-			end
-		end
-	end
-end)
-
-createToggle("Aimbot", function(state)
-	if state then
-		local mouse = LocalPlayer:GetMouse()
-		game:GetService("RunService").RenderStepped:Connect(function()
-			local target = nil
-			for _, player in pairs(Players:GetPlayers()) do
-				if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-					target = player.Character.HumanoidRootPart
-					break
-				end
-			end
-			if target and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-				mouse.TargetFilter = target
-				LocalPlayer.Character.Humanoid:MoveTo(target.Position)
-			end
-		end)
-	end
-end)
-
+createSection("Player")
+createToggle("Aimbot", function(state) end)
+createToggle("Player ESP", function(state) end)
+createToggle("Timer ESP", function(state) end)
+createToggle("Highest Value ESP", function(state) end)
 createToggle("Infinity Jump", function(state)
 	if state then
 		game:GetService("UserInputService").JumpRequest:Connect(function()
@@ -149,33 +125,14 @@ createToggle("Infinity Jump", function(state)
 		end)
 	end
 end)
+createToggle("Anti Ragdoll", function(state) end)
+createToggle("Chilli Booster", function(state) end)
+createToggle("Speed Boost", function(state) end)
 
-createToggle("Anti AFK", function(state)
-	if state then
-		for _, v in pairs(getconnections(LocalPlayer.Idled)) do
-			v:Disable()
-		end
-	end
-end)
-
-createToggle("Server Hop", function(state)
-	if state then
-		local tp = game:GetService("TeleportService")
-		local servers = {}
-		local req = syn and syn.request or http and http.request or http_request
-		local response = req({
-			Url = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"
-		})
-		local data = game:GetService("HttpService"):JSONDecode(response.Body)
-		for _, server in pairs(data.data) do
-			if server.playing < server.maxPlayers then
-				tp:TeleportToPlaceInstance(game.PlaceId, server.id)
-				break
-			end
-		end
-	end
-end)
-
+createSection("Server")
+createToggle("Server Hop", function(state) end)
+createToggle("Join Job-ID", function(state) end)
+createToggle("Copy Job-ID", function(state) end)
 createToggle("Reduce Graphics", function(state)
 	if state then
 		for _, obj in pairs(workspace:GetDescendants()) do
@@ -188,6 +145,8 @@ createToggle("Reduce Graphics", function(state)
 	end
 end)
 
+createSection("Helper")
+createToggle("Auto Load Script", function(state) end)
 createToggle("Webhook Activado", function(state)
 	if state then
 		local url = "TU_WEBHOOK_AQUI"
@@ -198,4 +157,17 @@ createToggle("Webhook Activado", function(state)
 		}
 		http:PostAsync(url, http:JSONEncode(data))
 	end
+end)
+
+-- Minimizar función
+createToggle("Minimizar Panel", function(state)
+	if state then
+		scroll.Visible = false
+		toggleBtn.Visible = true
+	end
+end)
+
+toggleBtn.MouseButton1Click:Connect(function()
+	scroll.Visible = true
+	toggleBtn.Visible = false
 end)
