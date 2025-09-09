@@ -1,0 +1,2 @@
+# BNXYUNG.lua
+BNX
