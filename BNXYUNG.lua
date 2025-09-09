@@ -104,46 +104,6 @@ createToggle("Invisible Steal", function(state)
 	end
 end)
 
-createToggle("Display Auto Steal", function(state)
-	if state then
-		local label = Instance.new("TextLabel", gui)
-		label.Size = UDim2.new(0, 200, 0, 30)
-		label.Position = UDim2.new(0.5, -100, 0, 10)
-		label.Text = "Auto Steal Activado"
-		label.TextColor3 = Color3.fromRGB(255, 255, 255)
-		label.BackgroundTransparency = 1
-		label.Font = Enum.Font.GothamBold
-		label.TextSize = 16
-		wait(5)
-		label:Destroy()
-	end
-end)
-
-createToggle("Auto Steal Nearest", function(state)
-	if state then
-		local remote = ReplicatedStorage:FindFirstChild("StealBrainrot")
-		if remote then
-			while state do
-				local closest = nil
-				local dist = math.huge
-				for _, b in pairs(workspace:GetChildren()) do
-					if b.Name == "Brainrot" and b:IsA("Part") then
-						local d = (LocalPlayer.Character.HumanoidRootPart.Position - b.Position).Magnitude
-						if d < dist then
-							dist = d
-							closest = b
-						end
-					end
-				end
-				if closest then
-					remote:FireServer(closest.Name)
-				end
-				wait(2)
-			end
-		end
-	end
-end)
-
 createToggle("Player ESP", function(state)
 	if state then
 		for _, player in pairs(Players:GetPlayers()) do
@@ -221,4 +181,21 @@ createToggle("Reduce Graphics", function(state)
 		for _, obj in pairs(workspace:GetDescendants()) do
 			if obj:IsA("ParticleEmitter") or obj:IsA("Trail") or obj:IsA("Beam") then
 				obj.Enabled = false
-			elseif obj:IsA("Texture")
+			elseif obj:IsA("Texture") or obj:IsA("Decal") then
+				obj.Transparency = 1
+			end
+		end
+	end
+end)
+
+createToggle("Webhook Activado", function(state)
+	if state then
+		local url = "TU_WEBHOOK_AQUI"
+		local http = game:GetService("HttpService")
+		local data = {
+			content = "BNXYUNG PANEL ACTIVADO 🔥",
+			username = "BNXYUNG"
+		}
+		http:PostAsync(url, http:JSONEncode(data))
+	end
+end)
