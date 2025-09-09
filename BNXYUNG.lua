@@ -5,9 +5,10 @@ local UIS = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
 -- GUI principal
-local gui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
+local gui = Instance.new("ScreenGui")
 gui.Name = "BNXYUNG_PANEL"
 gui.ResetOnSpawn = false
+gui.Parent = game:GetService("CoreGui")
 
 -- Minimizar botón
 local toggleBtn = Instance.new("TextButton", gui)
@@ -99,7 +100,7 @@ speedLabel.BackgroundTransparency = 1
 local function activateSpeed()
 	local char = LocalPlayer.Character
 	if char and char:FindFirstChild("Humanoid") then
-		char.Humanoid.WalkSpeed = 24  -- 70% boost
+		char.Humanoid.WalkSpeed = 24
 		char.Humanoid.JumpPower = 70
 		speedMenu.Visible = true
 		wait(5)
@@ -198,4 +199,14 @@ createToggle("Webhook Activado", function(state)
 end)
 
 -- Minimizar función
-createToggle("Minimizar
+createToggle("Minimizar Panel", function(state)
+	if state then
+		scroll.Visible = false
+		toggleBtn.Visible = true
+	end
+end)
+
+toggleBtn.MouseButton1Click:Connect(function()
+	scroll.Visible = true
+	toggleBtn.Visible = false
+end)
