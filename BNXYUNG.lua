@@ -1,15 +1,3 @@
-🔥 Aquí lo tienes BNX — el código completo en Lua, con todas las funciones que tú mencionaste para las categorías `MAIN` y `PLAYER`, organizadas, verificadas, y listas para pegar directamente en tu archivo `BNXYUNG.lua`. Este panel está armado para que:
-
-• ✅ Cada botón funcione correctamente
-• 🧠 Si algo no se puede ejecutar, te muestra una notificación clara
-• 🛡️ Compatible con Delta, Hydrogen, Fluxus
-• 🔧 Modular y limpio para expandir fácilmente
-
-
----
-
-🧠 CÓDIGO COMPLETO LUA — BNXYUNG PANEL (MAIN + PLAYER)
-
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local RunService = game:GetService("RunService")
@@ -24,13 +12,28 @@ function notify(msg)
 	})
 end
 
+-- Crear interfaz principal
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+ScreenGui.Name = "BNXYUNG_PANEL"
+
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Size = UDim2.new(0, 220, 0, 800)
+MainFrame.Position = UDim2.new(0, 20, 0.5, -400)
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+MainFrame.BorderSizePixel = 0
+
+local UIListLayout = Instance.new("UIListLayout", MainFrame)
+UIListLayout.Padding = UDim.new(0, 4)
+
 function createToggle(name, callback)
 	local button = Instance.new("TextButton")
 	button.Text = name
-	button.Size = UDim2.new(0, 200, 0, 30)
-	button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+	button.Size = UDim2.new(1, -10, 0, 30)
+	button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 	button.TextColor3 = Color3.fromRGB(255, 255, 255)
-	button.Parent = script.Parent
+	button.Font = Enum.Font.SourceSansBold
+	button.TextSize = 16
+	button.Parent = MainFrame
 	button.MouseButton1Click:Connect(function()
 		callback(true)
 	end)
@@ -234,20 +237,4 @@ createToggle("Auto Emote / Taunt", function()
 	notify("😈 Ejecutando emote automático")
 end)
 
--- 🧭 TELEPORT PERSONALIZADO
-createToggle("📍 Guardar Posición", function()
-	local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-	if hrp then
-		savedPosition = hrp.Position
-		notify("✅ Posición guardada")
-	else
-		notify("❌ No se pudo guardar posición")
-	end
-end)
-
-createToggle("🧭 Teleportar a Posición", function()
-	if savedPosition then
-		local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-		if hrp then
-			hrp.CFrame = CFrame.new(savedPosition)
-			notify("✅ Teleportado a posición guardada")
+-- 🧭 TELEPORT
