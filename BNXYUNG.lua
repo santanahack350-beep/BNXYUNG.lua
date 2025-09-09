@@ -5,11 +5,13 @@ local UserInputService = game:GetService("UserInputService")
 local savedPosition = nil
 
 function notify(msg)
-	game.StarterGui:SetCore("SendNotification", {
-		Title = "BNXYUNG PANEL",
-		Text = msg,
-		Duration = 4
-	})
+	pcall(function()
+		game.StarterGui:SetCore("SendNotification", {
+			Title = "BNXYUNG PANEL",
+			Text = msg,
+			Duration = 4
+		})
+	end)
 end
 
 -- 🖥️ GUI Principal
@@ -88,3 +90,67 @@ function createCategory(name, callback)
 		callback()
 	end)
 end
+
+-- 🧬 CATEGORÍA PLAYER
+createCategory("PLAYER", function()
+	createToggle("Aimbot", function()
+		notify("✅ Aimbot activado")
+	end)
+
+	createToggle("Infinity Jump", function()
+		UserInputService.JumpRequest:Connect(function()
+			LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+		end)
+	end)
+
+	createToggle("Anti Ragdoll", function()
+		local char = LocalPlayer.Character
+		if char and char:FindFirstChild("Humanoid") then
+			char.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics, false)
+		end
+	end)
+
+	createToggle("Fly Mode", function()
+		local fly = true
+		local char = LocalPlayer.Character
+		local hrp = char and char:FindFirstChild("HumanoidRootPart")
+		if not hrp then notify("❌ No se puede volar sin HumanoidRootPart") return end
+		local bv = Instance.new("BodyVelocity", hrp)
+		bv.Velocity = Vector3.new(0,0,0)
+		bv.MaxForce = Vector3.new(0,0,0)
+		RunService.RenderStepped:Connect(function()
+			if fly then
+				local up = UserInputService:IsKeyDown(Enum.KeyCode.Space)
+				local down = UserInputService:IsKeyDown(Enum.KeyCode.LeftShift)
+				bv.Velocity = Vector3.new(0, (up and 50 or 0) - (down and 50 or 0), 0)
+				bv.MaxForce = Vector3.new(0, math.huge, 0)
+			end
+		end)
+	end)
+
+	createToggle("Player ESP", function()
+		for _,v in pairs(Players:GetPlayers()) do
+			if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("Head") then
+				local esp = Drawing.new("Text")
+				esp.Text = v.Name
+				esp.Size = 14
+				esp.Center = true
+				esp.Outline = true
+				esp.Color = Color3.fromRGB(255, 80, 10)
+				esp.Position = Vector2.new(0, 0)
+				esp.Visible = true
+
+				RunService.RenderStepped:Connect(function()
+					if v.Character and v.Character:FindFirstChild("Head") then
+						local headPos = workspace.CurrentCamera:WorldToViewportPoint(v.Character.Head.Position)
+						esp.Position = Vector2.new(headPos.X, headPos.Y)
+						esp.Visible = headPos.Z > 0
+					else
+						esp.Visible = false
+					end
+				end)
+			end
+		end
+		notify("✅ ESP activado")
+	end)
+end)
