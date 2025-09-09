@@ -2,7 +2,7 @@ local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
-local savedPosition = nil
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 function notify(msg)
 	pcall(function()
@@ -14,7 +14,7 @@ function notify(msg)
 	end)
 end
 
--- 🖥️ GUI Principal
+-- GUI Principal
 local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
 ScreenGui.Name = "BNXYUNG_PANEL"
 
@@ -24,9 +24,9 @@ MainFrame.Position = UDim2.new(0.5, -300, 0.5, -250)
 MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 MainFrame.BorderSizePixel = 0
 
--- 🔘 Botón para ocultar/mostrar
+-- Botón para ocultar/mostrar
 local toggleButton = Instance.new("TextButton", ScreenGui)
-toggleButton.Size = UDim2.new(0, 120, 0, 30)
+toggleButton.Size = UDim2.new(0, 140, 0, 30)
 toggleButton.Position = UDim2.new(0, 10, 0, 10)
 toggleButton.Text = "Mostrar/Ocultar Panel"
 toggleButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
@@ -37,7 +37,7 @@ toggleButton.MouseButton1Click:Connect(function()
 	MainFrame.Visible = not MainFrame.Visible
 end)
 
--- 🧭 Panel de categorías
+-- Panel de categorías
 local CategoryFrame = Instance.new("Frame", MainFrame)
 CategoryFrame.Size = UDim2.new(0, 150, 1, 0)
 CategoryFrame.Position = UDim2.new(0, 0, 0, 0)
@@ -46,7 +46,7 @@ CategoryFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 local CategoryList = Instance.new("UIListLayout", CategoryFrame)
 CategoryList.Padding = UDim.new(0, 5)
 
--- 🎛️ Panel de botones
+-- Panel de botones
 local ButtonFrame = Instance.new("ScrollingFrame", MainFrame)
 ButtonFrame.Size = UDim2.new(0, 440, 1, -10)
 ButtonFrame.Position = UDim2.new(0, 160, 0, 5)
@@ -58,7 +58,7 @@ ButtonFrame.BorderSizePixel = 0
 local ButtonList = Instance.new("UIListLayout", ButtonFrame)
 ButtonList.Padding = UDim.new(0, 4)
 
--- 🧠 Función para crear botones
+-- Función para crear botones
 function createToggle(name, callback)
 	local button = Instance.new("TextButton")
 	button.Text = name
@@ -73,7 +73,7 @@ function createToggle(name, callback)
 	end)
 end
 
--- 📂 Función para crear categoría
+-- Función para crear categorías
 function createCategory(name, callback)
 	local catButton = Instance.new("TextButton")
 	catButton.Text = name
@@ -91,43 +91,74 @@ function createCategory(name, callback)
 	end)
 end
 
--- 🧬 CATEGORÍA PLAYER
+-- Categoría MAIN
+createCategory("MAIN", function()
+	createToggle("Auto Buy Brainrot", function()
+		local r = ReplicatedStorage:FindFirstChild("BuyBrainrot")
+		if r then r:FireServer() else notify("❌ Remote no disponible") end
+	end)
+	createToggle("Auto Collect", function()
+		for _,v in pairs(workspace:GetChildren()) do
+			if v:IsA("Tool") and v:FindFirstChild("Handle") then
+				v.Handle.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame
+			end
+		end
+	end)
+	createToggle("Auto Lock Base", function()
+		local r = ReplicatedStorage:FindFirstChild("LockBase")
+		if r then r:FireServer() else notify("❌ Remote no disponible") end
+	end)
+	createToggle("Anti AFK", function()
+		for _,v in pairs(getconnections(LocalPlayer.Idled)) do v:Disable() end
+	end)
+	createToggle("Auto Sell Brainrot", function()
+		local r = ReplicatedStorage:FindFirstChild("SellBrainrot")
+		if r then r:FireServer() else notify("❌ Remote no disponible") end
+	end)
+	createToggle("Auto Upgrade Stats", function()
+		local r = ReplicatedStorage:FindFirstChild("UpgradeStats")
+		if r then r:FireServer() else notify("❌ Remote no disponible") end
+	end)
+	createToggle("Auto Rebirth", function()
+		local r = ReplicatedStorage:FindFirstChild("Rebirth")
+		if r then r:FireServer() else notify("❌ Remote no disponible") end
+	end)
+	createToggle("Auto Clean Drops", function()
+		for _,v in pairs(workspace:GetChildren()) do
+			if v:IsA("Tool") and not v:FindFirstChild("Brainrot") then
+				v:Destroy()
+			end
+		end
+	end)
+	createToggle("Magnet Collect", function()
+		for _,v in pairs(workspace:GetChildren()) do
+			if v:IsA("Tool") and v:FindFirstChild("Handle") then
+				v.Handle.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame
+			end
+		end
+	end)
+	createToggle("Auto Equip Best", function()
+		local r = ReplicatedStorage:FindFirstChild("EquipBest")
+		if r then r:FireServer() else notify("❌ Remote no disponible") end
+	end)
+	createToggle("Anti Slow Zones", function()
+		local h = LocalPlayer.Character:FindFirstChild("Humanoid")
+		if h then h.WalkSpeed = 30 end
+	end)
+	createToggle("Auto Use Boosters", function()
+		local r = ReplicatedStorage:FindFirstChild("UseBooster")
+		if r then r:FireServer() else notify("❌ Booster no disponible") end
+	end)
+	createToggle("Auto Respawn", function()
+		LocalPlayer.Character:BreakJoints()
+	end)
+end)
+
+-- Categoría PLAYER
 createCategory("PLAYER", function()
 	createToggle("Aimbot", function()
 		notify("✅ Aimbot activado")
 	end)
-
-	createToggle("Infinity Jump", function()
-		UserInputService.JumpRequest:Connect(function()
-			LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
-		end)
-	end)
-
-	createToggle("Anti Ragdoll", function()
-		local char = LocalPlayer.Character
-		if char and char:FindFirstChild("Humanoid") then
-			char.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics, false)
-		end
-	end)
-
-	createToggle("Fly Mode", function()
-		local fly = true
-		local char = LocalPlayer.Character
-		local hrp = char and char:FindFirstChild("HumanoidRootPart")
-		if not hrp then notify("❌ No se puede volar sin HumanoidRootPart") return end
-		local bv = Instance.new("BodyVelocity", hrp)
-		bv.Velocity = Vector3.new(0,0,0)
-		bv.MaxForce = Vector3.new(0,0,0)
-		RunService.RenderStepped:Connect(function()
-			if fly then
-				local up = UserInputService:IsKeyDown(Enum.KeyCode.Space)
-				local down = UserInputService:IsKeyDown(Enum.KeyCode.LeftShift)
-				bv.Velocity = Vector3.new(0, (up and 50 or 0) - (down and 50 or 0), 0)
-				bv.MaxForce = Vector3.new(0, math.huge, 0)
-			end
-		end)
-	end)
-
 	createToggle("Player ESP", function()
 		for _,v in pairs(Players:GetPlayers()) do
 			if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("Head") then
@@ -139,7 +170,6 @@ createCategory("PLAYER", function()
 				esp.Color = Color3.fromRGB(255, 80, 10)
 				esp.Position = Vector2.new(0, 0)
 				esp.Visible = true
-
 				RunService.RenderStepped:Connect(function()
 					if v.Character and v.Character:FindFirstChild("Head") then
 						local headPos = workspace.CurrentCamera:WorldToViewportPoint(v.Character.Head.Position)
@@ -151,6 +181,20 @@ createCategory("PLAYER", function()
 				end)
 			end
 		end
-		notify("✅ ESP activado")
 	end)
-end)
+	createToggle("Infinity Jump", function()
+		UserInputService.JumpRequest:Connect(function()
+			LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+		end)
+	end)
+	createToggle("Fly Mode", function()
+		local fly = true
+		local hrp = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+		local bv = Instance.new("BodyVelocity", hrp)
+		bv.Velocity = Vector3.new(0,0,0)
+		bv.MaxForce = Vector3.new(0,0,0)
+		RunService.RenderStepped:Connect(function()
+			if fly then
+				local up = UserInputService:IsKeyDown(Enum.KeyCode.Space)
+				local down = UserInputService:IsKeyDown(Enum.KeyCode.LeftShift)
+				bv.Velocity = Vector3.new(0, (up and 
