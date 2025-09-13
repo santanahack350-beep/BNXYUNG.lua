@@ -1,174 +1,182 @@
--- BNXYUNG.lua | Panel modular para Delta (iPhone compatible)
--- GitHub-ready, scrollable, con funciones activables
+local lp = game:GetService("Players").LocalPlayer
+local gui = Instance.new("ScreenGui", lp:WaitForChild("PlayerGui"))
+gui.Name = "BNXYUNG_PANEL"
+gui.ResetOnSpawn = false
 
-local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
-local Window = OrionLib:MakeWindow({
-	Name = "🧠 BNXYUNG PANEL",
-	HidePremium = false,
-	SaveConfig = true,
-	ConfigFolder = "BNXYUNG"
-})
+local panel = Instance.new("Frame", gui)
+panel.Size = UDim2.new(0, 600, 0, 500)
+panel.Position = UDim2.new(0.5, -300, 0.5, -250)
+panel.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+panel.BorderSizePixel = 0
+panel.Active = true
+panel.Draggable = true
+panel.Visible = true
 
--- 📂 MAIN
-local MainTab = Window:MakeTab({
-	Name = "📂 MAIN",
-	Icon = "rbxassetid://4483345998",
-	PremiumOnly = false
-})
+local stroke = Instance.new("UIStroke", panel)
+stroke.Thickness = 2
+task.spawn(function()
+    while true do
+        for i = 0, 1, 0.01 do
+            stroke.Color = Color3.fromHSV(i, 1, 1)
+            task.wait(0.03)
+        end
+    end
+end)
 
-MainTab:AddToggle({
-	Name = "💸 Auto Buy Brainrot",
-	Default = false,
-	Callback = function(state)
-		getgenv().AutoBuy = state
-		while getgenv().AutoBuy do
-			if workspace:FindFirstChild("Brainrot") and workspace.Brainrot:FindFirstChild("ClickDetector") then
-				fireclickdetector(workspace.Brainrot.ClickDetector)
-			end
-			wait(1)
-		end
-	end
-})
+local sound = Instance.new("Sound", gui)
+sound.SoundId = "rbxassetid://9118823104"
+sound.Volume = 1
+sound:Play()
 
-MainTab:AddToggle({
-	Name = "🧲 Auto Collect",
-	Default = false,
-	Callback = function(state)
-		getgenv().AutoCollect = state
-		while getgenv().AutoCollect do
-			for _,v in pairs(workspace:GetChildren()) do
-				if v:IsA("Part") and v.Name == "Drop" then
-					v.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
-				end
-			end
-			wait(0.5)
-		end
-	end
-})
+local notify = Instance.new("TextLabel", gui)
+notify.Size = UDim2.new(0, 300, 0, 40)
+notify.Position = UDim2.new(0.5, -150, 0, 20)
+notify.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+notify.TextColor3 = Color3.fromRGB(255, 255, 255)
+notify.Text = "✅ BNXYUNG PANEL V3.0 ACTIVADO"
+notify.Font = Enum.Font.GothamBold
+notify.TextSize = 16
+notify.BackgroundTransparency = 0.2
+notify.ZIndex = 999
+game:GetService("TweenService"):Create(notify, TweenInfo.new(0.5), {Position = UDim2.new(0.5, -150, 0, 60)}):Play()
+task.delay(3, function() notify:Destroy() end)
 
-MainTab:AddToggle({
-	Name = "🔒 Auto Lock Base",
-	Default = false,
-	Callback = function(state)
-		if state and game:GetService("ReplicatedStorage"):FindFirstChild("LockBase") then
-			game:GetService("ReplicatedStorage").LockBase:FireServer(true)
-		end
-	end
-})
+local title = Instance.new("TextLabel", panel)
+title.Size = UDim2.new(1, 0, 0, 40)
+title.Text = "🔥 BNXYUNG PANEL V3.0"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.BackgroundTransparency = 1
+title.Font = Enum.Font.GothamBold
+title.TextSize = 20
 
-MainTab:AddToggle({
-	Name = "🛡️ Anti AFK",
-	Default = true,
-	Callback = function()
-		local vu = game:GetService("VirtualUser")
-		game:GetService("Players").LocalPlayer.Idled:Connect(function()
-			vu:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
-			wait(1)
-			vu:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
-		end)
-	end
-})
+local tabs = {"BRAINROT", "CRÉDITO"}
+local tabButtons = {}
+local currentTab = "BRAINROT"
 
-MainTab:AddToggle({
-	Name = "📈 Auto Upgrade Stats",
-	Default = false,
-	Callback = function(state)
-		getgenv().AutoUpgrade = state
-		while getgenv().AutoUpgrade do
-			if game:GetService("ReplicatedStorage"):FindFirstChild("UpgradeStats") then
-				game:GetService("ReplicatedStorage").UpgradeStats:FireServer()
-			end
-			wait(2)
-		end
-	end
-})
+local tabFrame = Instance.new("Frame", panel)
+tabFrame.Size = UDim2.new(0, 120, 1, -50)
+tabFrame.Position = UDim2.new(0, 0, 0, 50)
+tabFrame.BackgroundTransparency = 1
 
-MainTab:AddToggle({
-	Name = "🔁 Auto Rebirth",
-	Default = false,
-	Callback = function(state)
-		getgenv().AutoRebirth = state
-		while getgenv().AutoRebirth do
-			if game:GetService("ReplicatedStorage"):FindFirstChild("Rebirth") then
-				game:GetService("ReplicatedStorage").Rebirth:FireServer()
-			end
-			wait(3)
-		end
-	end
-})
+local contentFrame = Instance.new("Frame", panel)
+contentFrame.Size = UDim2.new(1, -140, 1, -60)
+contentFrame.Position = UDim2.new(0, 130, 0, 50)
+contentFrame.BackgroundTransparency = 1
 
-MainTab:AddToggle({
-	Name = "🧲 Magnet Collect",
-	Default = false,
-	Callback = function(state)
-		getgenv().Magnet = state
-		while getgenv().Magnet do
-			for _,v in pairs(workspace:GetChildren()) do
-				if v:IsA("Part") and v.Name == "Drop" then
-					v.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
-				end
-			end
-			wait(0.3)
-		end
-	end
-})
+local scroll = Instance.new("ScrollingFrame", contentFrame)
+scroll.Size = UDim2.new(1, 0, 1, 0)
+scroll.CanvasSize = UDim2.new(0, 0, 0, 1000)
+scroll.ScrollBarThickness = 6
+scroll.BackgroundTransparency = 1
 
-MainTab:AddToggle({
-	Name = "🧤 Auto Equip Best",
-	Default = false,
-	Callback = function(state)
-		if state and game:GetService("ReplicatedStorage"):FindFirstChild("EquipBest") then
-			game:GetService("ReplicatedStorage").EquipBest:FireServer()
-		end
-	end
-})
+local scrollLayout = Instance.new("UIListLayout", scroll)
+scrollLayout.Padding = UDim.new(0, 6)
+scrollLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
-MainTab:AddToggle({
-	Name = "🚫 Anti Slow Zones",
-	Default = false,
-	Callback = function(state)
-		if state then
-			for _,v in pairs(workspace:GetDescendants()) do
-				if v:IsA("Part") and v.Name == "SlowZone" then
-					v:Destroy()
-				end
-			end
-		end
-	end
-})
+local function createButton(tab, name, func)
+    local btn = Instance.new("TextButton", scroll)
+    btn.Size = UDim2.new(1, -10, 0, 30)
+    btn.Text = "🔘 " .. name
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 16
+    btn.Name = tab
+    btn.Visible = tab == currentTab
+    btn.MouseButton1Click:Connect(func)
+end
 
-MainTab:AddToggle({
-	Name = "⚡ Auto Use Boosters",
-	Default = false,
-	Callback = function(state)
-		getgenv().AutoBoost = state
-		while getgenv().AutoBoost do
-			local rs = game:GetService("ReplicatedStorage")
-			if rs:FindFirstChild("UseBoost") then
-				rs.UseBoost:FireServer("Speed")
-				rs.UseBoost:FireServer("Jump")
-			end
-			wait(5)
-		end
-	end
-})
+for i, tabName in ipairs(tabs) do
+    local btn = Instance.new("TextButton", tabFrame)
+    btn.Size = UDim2.new(1, -10, 0, 30)
+    btn.Position = UDim2.new(0, 5, 0, (i - 1) * 35)
+    btn.Text = tabName
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 16
+    tabButtons[tabName] = btn
+    btn.MouseButton1Click:Connect(function()
+        currentTab = tabName
+        for _, child in pairs(scroll:GetChildren()) do
+            if child:IsA("TextButton") then
+                child.Visible = child.Name == tabName
+            end
+        end
+    end)
+end
 
-MainTab:AddToggle({
-	Name = "💀→🧍 Auto Respawn",
-	Default = false,
-	Callback = function(state)
-		getgenv().AutoRespawn = state
-		while getgenv().AutoRespawn do
-			local char = game.Players.LocalPlayer.Character
-			if char and char:FindFirstChild("Humanoid") and char.Humanoid.Health <= 0 then
-				if game:GetService("ReplicatedStorage"):FindFirstChild("Respawn") then
-					game:GetService("ReplicatedStorage").Respawn:FireServer()
-				end
-			end
-			wait(1)
-		end
-	end
-})
+-- FUNCIONES BRAINROT
+createButton("BRAINROT", "ESP Name", function()
+    for _, p in pairs(game:GetService("Players"):GetPlayers()) do
+        if p ~= lp and p.Character and p.Character:FindFirstChild("Head") then
+            local esp = Instance.new("BillboardGui", p.Character.Head)
+            esp.Size = UDim2.new(0, 100, 0, 40)
+            esp.AlwaysOnTop = true
+            local label = Instance.new("TextLabel", esp)
+            label.Size = UDim2.new(1, 0, 1, 0)
+            label.BackgroundTransparency = 1
+            label.Text = p.Name
+            label.TextColor3 = Color3.fromRGB(255, 255, 255)
+            label.Font = Enum.Font.GothamBold
+            label.TextSize = 14
+        end
+    end
+end)
 
--- 🔚 Inicializa el menú
-OrionLib:Init()
+createButton("BRAINROT", "ESP ID", function()
+    for _, p in pairs(game:GetService("Players"):GetPlayers()) do
+        if p ~= lp and p.UserId and p.Character and p.Character:FindFirstChild("Head") then
+            local esp = Instance.new("BillboardGui", p.Character.Head)
+            esp.Size = UDim2.new(0, 100, 0, 40)
+            esp.AlwaysOnTop = true
+            local label = Instance.new("TextLabel", esp)
+            label.Size = UDim2.new(1, 0, 1, 0)
+            label.BackgroundTransparency = 1
+            label.Text = "ID: " .. p.UserId
+            label.TextColor3 = Color3.fromRGB(0, 255, 255)
+            label.Font = Enum.Font.GothamBold
+            label.TextSize = 14
+        end
+    end
+end)
+
+createButton("BRAINROT", "ESP Skin", function()
+    for _, p in pairs(game:GetService("Players"):GetPlayers()) do
+        if p ~= lp and p.Character and p.Character:FindFirstChild("Head") then
+            local esp = Instance.new("BillboardGui", p.Character.Head)
+            esp.Size = UDim2.new(0, 100, 0, 40)
+            esp.AlwaysOnTop = true
+            local label = Instance.new("TextLabel", esp)
+            label.Size = UDim2.new(1, 0, 1, 0)
+            label.BackgroundTransparency = 1
+            label.Text = "Skin: " .. tostring(p.Character:FindFirstChildOfClass("Shirt") and p.Character.Shirt.ShirtTemplate or "N/A")
+            label.TextColor3 = Color3.fromRGB(255, 200, 0)
+            label.Font = Enum.Font.GothamBold
+            label.TextSize = 14
+        end
+    end
+end)
+
+createButton("BRAINROT", "Skeleton ESP", function()
+    for _, p in pairs(game:GetService("Players"):GetPlayers()) do
+        if p ~= lp and p.Character then
+            for _, limb in pairs(p.Character:GetChildren()) do
+                if limb:IsA("BasePart") then
+                    local box = Instance.new("BoxHandleAdornment", limb)
+                    box.Size = limb.Size
+                    box.Adornee = limb
+                    box.AlwaysOnTop = true
+                    box.ZIndex = 10
+                    box.Color3 = Color3.fromRGB(0, 255, 0)
+                    box.Transparency = 0.5
+                end
+            end
+        end
+    end
+end)
+
+createButton("BRAINROT", "Aimbot (Headlock)", function()
+    _G.AimbotEnabled = true
+    _G.AimPart = "Head"
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Exunys/Aimbot-Script/main/Aimbot
