@@ -105,3 +105,45 @@ for i, tabName in ipairs(tabs) do
         end
     end)
 end
+-- BOTÓN MINIMIZAR
+local hide = Instance.new("TextButton", panel)
+hide.Size = UDim2.new(0, 30, 0, 30)
+hide.Position = UDim2.new(1, -70, 0, 10)
+hide.Text = "-"
+hide.TextColor3 = Color3.fromRGB(255, 255, 255)
+hide.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+hide.Font = Enum.Font.GothamBold
+hide.TextSize = 20
+hide.MouseButton1Click:Connect(function()
+    panel.Visible = false
+    showBtn.Visible = true
+end)
+
+-- BOTÓN CERRAR
+local close = Instance.new("TextButton", panel)
+close.Size = UDim2.new(0, 30, 0, 30)
+close.Position = UDim2.new(1, -35, 0, 10)
+close.Text = "X"
+close.TextColor3 = Color3.fromRGB(255, 255, 255)
+close.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+close.Font = Enum.Font.GothamBold
+close.TextSize = 20
+close.MouseButton1Click:Connect(function()
+    gui:Destroy()
+end)
+
+-- BOTÓN FLOTANTE PARA REABRIR PANEL
+local showBtn = Instance.new("TextButton", gui)
+showBtn.Size = UDim2.new(0, 160, 0, 40)
+showBtn.Position = UDim2.new(0, 20, 0.5, -20)
+showBtn.Text = "+ BNXYUNG PANEL"
+showBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+showBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+showBtn.Font = Enum.Font.GothamBold
+showBtn.TextSize = 16
+showBtn.Visible = false
+showBtn.MouseButton1Click:Connect(function()
+    panel.Visible = true
+    showBtn.Visible = false
+end)
+
