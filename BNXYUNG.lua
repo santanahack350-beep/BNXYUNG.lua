@@ -146,4 +146,3 @@ showBtn.MouseButton1Click:Connect(function()
     panel.Visible = true
     showBtn.Visible = false
 end)
-
